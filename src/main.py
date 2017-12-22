@@ -1,11 +1,21 @@
+from termcolor import colored, cprint
+
+def print_(a):
+    print(a, end='')
+
 class BrainfuckState:
-    def __init__(self):
-        self.ptr = 0
-        self.data = [0 for _ in range(100)]
-        self.pos = 0
-    
+    def __init__(self, print_and_wait = False):
+        self.print_and_wait = print_and_wait
+
     def execute(self, text):
+        self.size = 20
+        self.ptr = 0
+        self.data = [0 for _ in range(self.size)]
+        self.pos = 0
         self.text = text
+        if self.print_and_wait:
+            self.print_state()
+            input()
         while self.pos < len(text):
             {
                 '+' : self.plus,
@@ -18,7 +28,23 @@ class BrainfuckState:
                 ']' : self.end_loop
             }[text[self.pos]]()
             self.pos += 1
+            if self.print_and_wait:
+                self.print_state()
+                input()
 
+
+    def print_state(self):
+        print_('[')
+        first = True
+        for i in range(self.size):
+            if not first:
+                print_(', ')
+            first = False
+            if self.ptr == i:
+                cprint(str(self.data[i]), 'red', 'on_white', end='')
+            else:
+                print_(str(self.data[i]))
+        print(']')
 
     def incr_cur(self, incr):
         self.data[self.ptr] += incr
