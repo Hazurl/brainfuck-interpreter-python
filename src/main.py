@@ -1,56 +1,64 @@
-def plus(data, ptr, text, pos):
-    data[ptr] = data[ptr] + 1
-    return data, ptr, pos
+class BrainfuckState:
+    def __init__(self):
+        self.ptr = 0
+        self.data = [0 for _ in range(100)]
+        self.pos = 0
+    
+    def execute(self, text):
+        self.text = text
+        while self.pos < len(text):
+            {
+                '+' : self.plus,
+                '-' : self.minus,
+                '.' : self.opt,
+                ',' : self.ipt,
+                '>' : self.right,
+                '<' : self.left,
+                '[' : self.start_loop,
+                ']' : self.end_loop
+            }[text[self.pos]]()
+            self.pos += 1
 
-def minus(data, ptr, text, pos):
-    data[ptr] = data[ptr] - 1
-    return data, ptr, pos
 
-def opt(data, ptr, text, pos):
-    print(chr(data[ptr]), end='')
-    return data, ptr, pos
+    def incr_cur(self, incr):
+        self.data[self.ptr] += incr
 
-def ipt(data, ptr, text, pos):
-    data[ptr] = input()
-    return data, ptr, pos
+    def incr_ptr(self, incr):
+        self.ptr += incr
 
-def left(data, ptr, text, pos):
-    return data, ptr - 1, pos
+    def cur(self):
+        return self.data[self.ptr]
 
-def right(data, ptr, text, pos):
-    return data, ptr + 1, pos
+    def plus(self):
+        self.incr_cur(1)
 
-def start_loop(data, ptr, text, pos):
-    if data[ptr] == 0:
-        while text[pos] != ']':
-            pos = pos + 1
-    return data, ptr, pos
+    def minus(self):
+        self.incr_cur(-1)
 
-def end_loop(data, ptr, text, pos):
-    if data[ptr] != 0:
-        while text[pos] != '[':
-            pos = pos - 1
-    return data, ptr, pos
+    def opt(self):
+        print(chr(self.cur()), end='')
 
-def execute (text):
-    data = [0 for _ in range(100)]
-    ptr = 10
-    pos = 0
+    def ipt(self):
+        self.data[self.ptr] = input()
 
-    while pos < len(text):
-        data, ptr, pos = {
-            '+' : plus,
-            '-' : minus,
-            '.' : opt,
-            ',' : ipt,
-            '>' : right,
-            '<' : left,
-            '[' : start_loop,
-            ']' : end_loop
-        }[text[pos]](data, ptr, text, pos)
-        pos = pos + 1
+    def left(self):
+        self.incr_ptr(-1)
+
+    def right(self):
+        self.incr_ptr(+1)
+
+    def start_loop(self):
+        if self.cur() == 0:
+            while self.text[self.pos] != ']':
+                self.pos += 1
+
+    def end_loop(self):
+        if self.cur() != 0:
+            while self.text[self.pos] != '[':
+                self.pos -= 1
 
 
 if __name__ == '__main__':
     bf = "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>."
-    execute(bf)
+    state = BrainfuckState()
+    state.execute(bf)
