@@ -106,5 +106,5 @@ class State:
         return self.pos >= len(self.text)
 
 if __name__ == '__main__':
-    state = State(50, "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.")
+    state = State(50, open("test.bf").read())
     until_EOF(chain(start_loop, end_loop, plus, minus, left, right, out, ipt), state)
