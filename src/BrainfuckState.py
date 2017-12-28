@@ -19,6 +19,7 @@ class BrainfuckState:
             self.print_state()
             input()
         while not self.is_EOF():
+            self.need_stop = True
             {
                 '+' : self.plus,
                 '-' : self.minus,
@@ -30,15 +31,27 @@ class BrainfuckState:
                 ']' : self.end_loop,
                 '#' : self.comment,
                 '@' : self.dump_value,
-                '$' : self.print_state
+                '$' : self.print_state,
+                '%' : self.start_step_by_step,
+                '!' : self.stop_step_by_step
             }.get(text[self.pos], self.pass_it)()
             self.advance()
-            if self.print_and_wait:
+            if self.print_and_wait and self.need_stop:
                 self.print_state()
                 input()
 
+    def start_step_by_step(self):
+        self.need_stop = False
+        print('step by step ON')
+        self.print_and_wait = True
+
+    def stop_step_by_step(self):
+        self.need_stop = False
+        print('step by step OFF')
+        self.print_and_wait = False
 
     def print_state(self):
+        self.need_stop = False
         print_(str(self.line) + '> [')
         first = True
         for i in range(self.size_used + 1):
@@ -142,6 +155,7 @@ class BrainfuckState:
                     indent += 1
 
     def comment(self):
+        self.need_stop = False
         self.advance()
         if not self.is_EOF() and self.current_char() == ':':
             self.advance()
@@ -156,9 +170,11 @@ class BrainfuckState:
             self.advance()
 
     def dump_value(self):
+        self.need_stop = False
         print(self.line, '> At', self.ptr, ':', self.data[self.ptr])
 
     def pass_it(self):
+        self.need_stop = False
         c = self.current_char()
         if c == ' ' or c == '\n' or c == '\t':
             return
