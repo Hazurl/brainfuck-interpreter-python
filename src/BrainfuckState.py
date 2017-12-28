@@ -10,6 +10,7 @@ class BrainfuckState:
     def execute(self, text):
         self.line = 1
         self.size = 2000
+        self.size_used = 0
         self.ptr = 0
         self.data = [0 for _ in range(self.size)]
         self.pos = 0
@@ -28,7 +29,8 @@ class BrainfuckState:
                 '[' : self.start_loop,
                 ']' : self.end_loop,
                 '#' : self.comment,
-                '@' : self.dump_value
+                '@' : self.dump_value,
+                '$' : self.print_state
             }.get(text[self.pos], self.pass_it)()
             self.advance()
             if self.print_and_wait:
@@ -37,16 +39,19 @@ class BrainfuckState:
 
 
     def print_state(self):
-        print_('[')
+        print_(str(self.line) + '> [')
         first = True
-        for i in range(self.size):
+        for i in range(self.size_used + 1):
             if not first:
-                print_(', ')
+                print_('|')
             first = False
+            s = str(self.data[i])
+            while len(s) < 3 and i >= 39:
+                s = ' ' + s
             if self.ptr == i:
-                cprint(str(self.data[i]), 'red', 'on_white', end='')
+                cprint(s, 'red', 'on_white', end='')
             else:
-                print_(str(self.data[i]))
+                print_(s)
         print(']')
 
     def set_value(self, value):
@@ -58,6 +63,7 @@ class BrainfuckState:
 
     def move(self, delta):
         self.ptr += delta
+        self.size_used = max(self.ptr, self.size_used)
 
     def advance(self, delta=1):
         if delta > 0:
@@ -100,7 +106,10 @@ class BrainfuckState:
         print(chr(self.get_value()), end='')
 
     def ipt(self):
-        self.set_value(ord(input()[0]))
+        i = input()
+        if len(i) == 0:
+            i = chr(0)
+        self.set_value(ord(i[0]))
 
     def left(self):
         self.move(-1)
