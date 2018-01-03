@@ -52,14 +52,14 @@ class BrainfuckState:
 
     def print_state(self):
         self.need_stop = False
-        print_(str(self.line) + '> [')
+        print_(str(self.line) + '> @' + str(self.ptr) + ' [')
         first = True
         for i in range(self.size_used + 1):
             if not first:
                 print_('|')
             first = False
             s = str(self.data[i])
-            while len(s) < 3 and i >= 39:
+            while len(s) < 3 and i >= 2 and i <= 21:
                 s = ' ' + s
             if self.ptr == i:
                 cprint(s, 'red', 'on_white', end='')
@@ -103,8 +103,8 @@ class BrainfuckState:
     def clamp(self):
         if self.get_value() < 0:
             self.set_value(0)
-        if  self.get_value() > 255:
-            self.set_value(255)
+        if  self.get_value() > 65536:
+            self.set_value(65536)
 
     def incr_value(self, incr):
         self.set_value(self.get_value() + incr)
