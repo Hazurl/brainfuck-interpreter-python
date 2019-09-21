@@ -1,6 +1,7 @@
 from BrainfuckState import BrainfuckState
+import sys
 
 if __name__ == '__main__':
-    bf = open("olc_challenge_9.bf").read()
+    bf = open(sys.argv[1]).read()
     state = BrainfuckState()
     state.execute(bf)
